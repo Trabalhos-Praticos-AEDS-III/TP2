@@ -1,245 +1,103 @@
 # TP2
 
-# Alunos:
-
+### Alunos
 - Edson Pimenta de Almeida
 - Luís Augusto Starling Toledo
 - Luiz Gabriel Milione Assis
-- 
-# Descrição do trabalho:
 
-  O TP2 é uma adição ao trabalho do TP1. Seu objetivo é criar as classes ArquivoTarefa e ArquivoCategoria que, alem de fazer o CRUD genérico, também conseguem atualizar um índice indireto, uma vez que uma tarefa possui uma categoria, necessitando de um índice secundário. O índice é criado em uma árvore B+.
-  
-# Classes:
+### Descrição do Projeto
 
-- Arquivo
-- ArquivoCategoria
-- ArquivoTarefa
-- ArvoreBMais
-- ParIdId
-- ParNomeId
-- HashExtensivel
-- ParIdEndereço
-- MenuCategorias
-- MenuTarefas
-- Categoria
-- Tarefa
-- Main
-- 
-# Interfaces:
+Este projeto expande as funcionalidades do trabalho TP1, adicionando as classes `ArquivoTarefa` e `ArquivoCategoria` para realizar operações CRUD e gerenciar um índice indireto. Como cada tarefa está associada a uma categoria, é necessário um índice secundário para manter essa relação, implementado por meio de uma árvore B+.
 
-- Registro
-- RegistroArvoreBMais
-- RegistroHashExtensivel
-- 
-# Classe Arquivo
+### Estrutura de Classes
 
-Responsável pelo CRUD de objetos do tipo genérico T, que devem estender a interface Registro.
+#### Principais Classes
 
-# Atributos
+- **Arquivo**: Classe base para operações CRUD genéricas.
+- **ArquivoCategoria**: Extensão de `Arquivo` para manipulação de objetos `Categoria`, com índice indireto de categorias.
+- **ArquivoTarefa**: Extensão de `Arquivo` para manipulação de objetos `Tarefa`, com índice indireto para busca de tarefas por categoria.
+- **ArvoreBMais**: Implementação da árvore B+ para índices secundários.
+- **HashExtensivel**: Índice direto baseado em hashing extensível.
+- **MenuCategorias** e **MenuTarefas**: Interfaces de interação com o usuário para gerenciamento de categorias e tarefas.
+- **Categoria** e **Tarefa**: Representam as entidades principais, com atributos específicos.
+- **Main**: Classe principal que inicia a aplicação e gerencia a interação do usuário.
 
-int representando o tamanho do cabeçalho.
-RandomAccessFile arquivo: o arquivo a ser manipulado.
-String nome_arquivo: nome do arquivo a ser manipulado.
-Constructor construtor: construtor da classe T.
-HashExtensivel indice_direto: arquivo com índices diretos.
+#### Interfaces
 
-# Métodos
+- **Registro**: Interface para operações genéricas de persistência.
+- **RegistroArvoreBMais**: Interface para uso em estruturas de índice indireto B+.
+- **RegistroHashExtensivel**: Interface para indexação direta com hash extensível.
 
-Construtor: Recebe uma String e um Constructor para abrir ou criar o arquivo RandomAccessFile e o construtor da classe T. Inicializa o cabeçalho com o número 0, se necessário.
-create: Recebe um objeto T, atribui um novo ID, escreve o registro no arquivo e o índice direto. Retorna o ID.
-read: Recebe o ID e retorna o objeto ou null, verificando a validade da lápide.
-delete: Recebe o ID e marca o registro como inválido, retornando verdadeiro ou falso.
-update: Atualiza o registro no arquivo, comparando o tamanho do novo registro com o original. Se o tamanho for maior, o novo registro é escrito no final.
-close: Fecha o arquivo.
+### Detalhes das Classes
 
-# Classe Aquivo Categoria
+#### Classe `Arquivo`
+Responsável pelo CRUD genérico de objetos do tipo `T`, que devem implementar a interface `Registro`.
 
-Extende a classe Arquivo para  fazer o CRUD de objetos do tipo Categoria. Possui os atributos:
-Arquivo<Categoria> arq_categoria: Banco de dados dos objetos Categoria
-ArvoreBMais<ParNomeId> indice_indireto_nome: Árvore B+ responsavel por armazenar os pares nome_categoria e id_categoria juntamente com o seu endereço no BD. Um índice indireto.
+- **Atributos**:
+  - `int tamanho_cabecalho`: Tamanho do cabeçalho.
+  - `RandomAccessFile arquivo`: Arquivo de dados.
+  - `String nome_arquivo`: Nome do arquivo.
+  - `Constructor<T> construtor`: Construtor da classe T.
+  - `HashExtensivel indice_direto`: Índice direto para acesso rápido.
 
-# Construtor: 
-Inicializa o arquivo de categorias e o índice indireto
-# int create: 
-Recebe um objeto Categoria, que é criado no banco de dados e no índice indireto. Retorna o ID criado.
-# Categoria read:
-Recebe uma String e pesquisa uma categoria no Banco de dados com o nome correspondente. Retorna um objeto Categoria
-# boolean delete:
-Recebe uma String e deleta no banco de dados a Categoria com o nome correspondente. Retorna verdadeiro para uma operação bem sucedida ou falso para uma operação falha.
-# void list:
-Imprime todas as categorias presentes no banco de dados.
-# boolean update:
-Recebe uma categoria já existente no Banco de dados e atualiza seus registros. Retorna verdadeiro para uma operação bem sucedida ou falso para uma operação falha.
+- **Métodos**:
+  - `create(T obj)`: Insere um novo objeto, atribui ID, e escreve o índice direto.
+  - `read(int id)`: Recupera o objeto pelo ID.
+  - `delete(int id)`: Marca o registro como inválido.
+  - `update(T obj)`: Atualiza o registro, realocando-o se necessário.
+  - `close()`: Fecha o arquivo.
 
-# Classe Arquivo Tarefa
+#### Classe `ArquivoCategoria`
+Extende `Arquivo` para `Categoria`, com índice indireto para busca de categorias por nome.
 
-Extende a classe Arquivo para  fazer o CRUD de objetos do tipo Tarefa. Possui os atributos:
-Arquivo<Tarefa> arq_tarefa: Banco de dados dos objetos Tarefa
-ArvoreBMais<ParIdId> indice_indireto_id: Indece indireto, armazenando pares id_categoria e id_tarefa em uma Árvore B+
+- **Atributos**:
+  - `ArvoreBMais<ParNomeId> indice_indireto_nome`: Índice para pares `nome_categoria` e `id_categoria`.
 
-# Construtor:
-Inicializa o arquivo de tarefas e o índice indireto
-# int create:
-Recebe um objeto Tarefa, que é criado no banco de dados e no índice indireto. Retorna o ID criado.
-# ArrayList<Tarefa> readAll:
-Lê todas as tarefas com base no id_categoria pela Hash, retorna um ArrayList com todas as tarefas.
-# boolean delete:
-Deleta uma tarefa e remove do índice indireto. Retorna verdadeiro para uma operação bem sucedida ou falso para uma operação falha.
-# boolean update:
-Recebe uma tarefa já existente no Banco de dados e atualiza seus registros. Retorna verdadeiro para uma operação bem sucedida ou falso para uma operação falha.
+- **Métodos**:
+  - `int create(Categoria categoria)`: Insere a categoria e atualiza o índice.
+  - `Categoria read(String nome)`: Pesquisa uma categoria por nome.
+  - `boolean delete(String nome)`: Remove uma categoria pelo nome.
+  - `void list()`: Lista todas as categorias.
+  - `boolean update(Categoria categoria)`: Atualiza uma categoria existente.
 
-# Classe ArvoreBMais:
-Serve como índire indireto de objetos T que implementam a interface RegistroArvoreBMais.
+#### Classe `ArquivoTarefa`
+Extende `Arquivo` para `Tarefa`, com índice indireto para acesso a tarefas por categoria.
 
-#Métodos:
-- Create
-- Read
-- Delete
+- **Atributos**:
+  - `ArvoreBMais<ParIdId> indice_indireto_id`: Índice para pares `id_categoria` e `id_tarefa`.
 
-# Classe ParIdId:
-Esta classe representa um objeto para uma entidade Id, Id que será armazenado em uma árvore B+.
+- **Métodos**:
+  - `int create(Tarefa tarefa)`: Insere a tarefa e atualiza o índice.
+  - `ArrayList<Tarefa> readAll(int id_categoria)`: Retorna todas as tarefas de uma categoria.
+  - `boolean delete(int id)`: Remove uma tarefa e atualiza o índice.
+  - `boolean update(Tarefa tarefa)`: Atualiza uma tarefa existente.
 
-# Métodos:
-- Construtor
-- Getters
-- Setters
-- clone
-- size
-- compareTo
-- toString
-- toByteArray
+### Classes de Suporte
 
-# Classe ParNomeId:
-Esta classe representa um objeto para uma entidade Nome, Id que será armazenado em uma árvore B+.
+- **ParIdId** e **ParNomeId**: Representam pares de valores para indexação em árvore B+.
+- **HashExtensivel**: Implementa a indexação direta para classes que estendem `RegistroHashExtensivel`.
 
-# Métodos:
-- Construtor
-- Getters
-- Setters
-- clone
-- size
-- compareTo
-- toString
-- toByteArray
+### Menus de Interação
 
-# Classe HashExtensivel
-Serve como índice direto para objetos T que implementem a interface RegistroHashExtensivel.
+- **MenuCategorias** e **MenuTarefas**: Interagem com o usuário, permitindo inclusão, busca, alteração e exclusão de categorias e tarefas.
 
-Métodos
-- create
-- read
-- update
-- delete
+### Classe `Main`
+Executa a aplicação, gerenciando o menu principal e capturando interações do usuário.
 
-# Classe ParIDEndereco
-Implementa a interface RegistroHashExtensivel, com os atributos:
+### Implementação Técnica
 
-- int id
-- long endereço
+#### Índices e Consistência
 
-# Métodos
-- Construtores
-- getters
-- setters
-- toByteArray
-- fromByteArray
+- Índice direto de categorias implementado? **Sim**
+- Índice indireto para categorias por nome? **Sim**
+- ID de categoria como chave estrangeira em tarefas? **Sim**
+- Árvore B+ para relação 1:N entre categorias e tarefas? **Sim**
+- Listagem de tarefas por categoria? **Sim**
+- Exclusão de categorias verifica tarefas vinculadas? **Sim**
+- Inclusão de tarefa é limitada a categorias existentes? **Sim**
 
-# Classe MenuCategorias:
-Classe responsável por interagir com o usuário e o banco de dados de Categoria
+#### Estado do Projeto
 
-# Atributos:
-- ArquivoTarefa arq_tarefa: Banco de dados com as tarefas
-- ArquivoCategoria arq_categoria: Banco de dados com as categorias
-- Scanner sc: Scanner responsável por ler os inputs do usuário 
-
-# Métodos:
-- void menu: Mostra as opções para o usuário escolher. Chama as funções responsáveis por fazer as ações escolhidas pelo usuário.
-- void buscarCategoria: Lê do usuário uma categoria e pesquisa no banco de dados. Imprime o resultado na tela.
-- void incluirCategoria: Lê do usuário uma categoria e a armazena no Banco de dados.
-- void alterarCategoria: Lê do usuário uma categoria, caso exista atualiza com novas informações providas pelo usuário, a armazena no Banco de dados as novas informações.
-- void excluirCategoria: Lê do usuário uma categoria, caso exista deleta do banco de dados.
-
-# Classe MenuTarefas:
-Classe responsável por interagir com o usuário e o banco de dados de Tarefa
-
-# Atributos:
-- ArquivoTarefa arq_tarefa: Banco de dados com as tarefas
-- ArquivoCategoria arq_categoria: Banco de dados com as categorias
-- Scanner sc: Scanner responsável por ler os inputs do usuário 
-
-# Métodos:
-- void menu: Mostra as opções para o usuário escolher. Chama as funções responsáveis por fazer as ações escolhidas pelo usuário.
-- void buscarTarefa: Lê do usuário uma tarefa e pesquisa no banco de dados. Imprime o resultado na tela.
-- void incluirTarefa: Lê do usuário uma tarefa e a armazena no Banco de dados.
-- void alterarTarefa: Lê do usuário uma tarefa, caso exista atualiza com novas informações providas pelo usuário, a armazena no Banco de dados as novas informações.
-- void excluirTarefa: Lê do usuário uma tarefa, caso exista deleta do banco de dados.
-
-# Classe Tarefa
-Representa uma tarefa com os seguintes atributos:
-
-Nome (String)
-Data de criação e conclusão (LocalDate)
-Status (String)
-Prioridade (byte)
-
-# Métodos
-construtores
-getters
-setters
-toByteArray
-fromByteArray
-toString
-
-# Classe Categoria
-Representa uma Categoria com os atributos:
-- int id
-- String nome
-
-# Métodos:
-- Costrutores
-- Getters
-- Setters
-- toByteArray
-- fromByteArray
-
-# Interface Registro
-Obriga que as classes que implentem a interface possuam:
--  public void setId(int i)
--  public int getId()
--  public byte[] toByteArray() throws IOException
--  public void fromByteArray(byte[] b) throws IOException
-
-# Interface RegistroArvoreBMais
-Obriga as classes a implementarem:
-- public short size()
-- public byte[] toByteArray() throws IOException
-- public void fromByteArray(byte[] ba) throws IOException
-- public int compareTo(T obj)
-- public T clone()
-
-# Interface RegistroHashExtensivel
-Obriga as classes a implementarem:
-- public int hashCode()
-- public short size()
-- public byte[] toByteArray() throws IOException
-- public void fromByteArray(byte[] ba) throws IOException
-
-# Classe Main
-Responsavel por rodar a aplicação, possui a função main que interage com o usuário.
-
-# Relato dos Alunos
-- Todos os requisitos foram implementados sem problemas ou dificuldades.
-- Os resultados foram alcançados.
-
-# Perguntas:
-- O CRUD (com índice direto) de categorias foi implementado? SIM
-- Há um índice indireto de nomes para as categorias? SIM
-- O atributo de ID de categoria, como chave estrangeira, foi criado na classe Tarefa? SIM
-- Há uma árvore B+ que registre o relacionamento 1:N entre tarefas e categorias? SIM
-- É possível listar as tarefas de uma categoria? SIM
-- A remoção de categorias checa se há alguma tarefa vinculada a ela? SIM
-- A inclusão da categoria em uma tarefa se limita às categorias existentes? SIM
-- O trabalho está funcionando corretamente? SIM
-- O trabalho está completo? SIM
-- O trabalho é original e não a cópia de um trabalho de outro grupo? SIM
+- Funcionando corretamente? **Sim**
+- Completo? **Sim**
+- Trabalho original? **Sim**
